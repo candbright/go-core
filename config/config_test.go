@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-var testData string = `
+var testData = `
 application:
   name: 'test'
   port:
@@ -17,6 +17,7 @@ application:
   osdir:
     linux: '/root'
     windows: 'D:/home'
+release: true
 db:
   default: 'tcp:127.0.0.1:3306'
   env: ${CORE_DB}`
@@ -32,4 +33,5 @@ func TestAppConfig_Get(t *testing.T) {
 	fmt.Println(cfg.Get("application.dir"))
 	fmt.Println(cfg.Get("application.osdir"))
 	fmt.Println(cfg.Get("db"))
+	fmt.Println(cfg.Get("release"))
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -84,12 +83,6 @@ func (c *Config) Get(key string) string {
 	if val, ok := value.(string); ok {
 		return val
 	}
-	if val, ok := value.(int); ok {
-		return strconv.Itoa(val)
-	}
-	if val, ok := value.(int64); ok {
-		return strconv.FormatInt(val, 10)
-	}
 	if valMap, ok := value.(map[interface{}]interface{}); ok {
 		env := envParser(valMap)
 		if env != nil {
@@ -104,8 +97,81 @@ func (c *Config) Get(key string) string {
 			return osV.Get()
 		}
 	}
-	fmt.Println("-value type is unsupported")
+	if val, ok := value.(interface{}); ok {
+		return fmt.Sprint(val)
+	}
 	return ""
+}
+
+func (c *Config) GetInt(key string) int {
+	return int(c.GetInt64(key))
+}
+
+func (c *Config) GetInt64(key string) int64 {
+	if c.data == nil {
+		fmt.Println("config data is nil, please parse first")
+		return -1
+	}
+	split := strings.Split(key, ".")
+	value := get(split, c.data)
+	if value == nil {
+		fmt.Println("value is nil, please input the right key")
+		return -1
+	}
+	if val, ok := value.(int); ok {
+		return int64(val)
+	}
+	if val, ok := value.(int64); ok {
+		return val
+	}
+	if valMap, ok := value.(map[interface{}]interface{}); ok {
+		env := envParser(valMap)
+		if env != nil {
+			return env.GetInt64()
+		}
+		archV := archParser(valMap)
+		if archV != nil {
+			return archV.GetInt64()
+		}
+		osV := osParser(valMap)
+		if osV != nil {
+			return osV.GetInt64()
+		}
+	}
+	fmt.Println("value type is unsupported")
+	return -1
+}
+
+func (c *Config) GetBool(key string) bool {
+	if c.data == nil {
+		fmt.Println("config data is nil, please parse first")
+		return false
+	}
+	split := strings.Split(key, ".")
+	value := get(split, c.data)
+	if value == nil {
+		fmt.Println("value is nil, please input the right key")
+		return false
+	}
+	if val, ok := value.(bool); ok {
+		return val
+	}
+	if valMap, ok := value.(map[interface{}]interface{}); ok {
+		env := envParser(valMap)
+		if env != nil {
+			return env.GetBool()
+		}
+		archV := archParser(valMap)
+		if archV != nil {
+			return archV.GetBool()
+		}
+		osV := osParser(valMap)
+		if osV != nil {
+			return osV.GetBool()
+		}
+	}
+	fmt.Println("value type is unsupported")
+	return false
 }
 
 func get(keys []string, tree map[interface{}]interface{}) interface{} {

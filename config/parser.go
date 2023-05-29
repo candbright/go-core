@@ -9,6 +9,7 @@ import (
 
 type Parser interface {
 	parser
+	GetBool() bool
 	GetInt() int
 	GetInt64() int64
 }
@@ -21,12 +22,15 @@ type BaseParser struct {
 	parser
 }
 
-func (p *BaseParser) GetInt() int {
-	intVal, err := strconv.Atoi(p.Get())
-	if err != nil {
-		return 0
+func (p *BaseParser) GetBool() bool {
+	if strings.ToLower(p.Get()) == "true" {
+		return true
 	}
-	return intVal
+	return false
+}
+
+func (p *BaseParser) GetInt() int {
+	return int(p.GetInt64())
 }
 
 func (p *BaseParser) GetInt64() int64 {
