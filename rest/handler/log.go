@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/candbright/go-log/log"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -48,7 +49,7 @@ func LogHandler() gin.HandlerFunc {
 			fields := map[string]interface{}{
 				"ClientIP": c.ClientIP(),
 				"Path":     path,
-				"Latency":  time.Now().Sub(start),
+				"Latency":  fmt.Sprintf("%13v", time.Now().Sub(start)),
 				"Method":   c.Request.Method,
 				"Status":   c.Writer.Status(),
 			}
