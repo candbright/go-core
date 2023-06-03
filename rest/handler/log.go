@@ -7,6 +7,7 @@ import (
 	"github.com/candbright/go-log/log"
 	"github.com/gin-gonic/gin"
 	"io"
+	"strings"
 	"time"
 )
 
@@ -49,7 +50,7 @@ func LogHandler() gin.HandlerFunc {
 			fields := map[string]interface{}{
 				"ClientIP": c.ClientIP(),
 				"Path":     path,
-				"Latency":  fmt.Sprintf("%13v", time.Now().Sub(start)),
+				"Latency":  strings.TrimSpace(fmt.Sprintf("%13v", time.Now().Sub(start))),
 				"Method":   c.Request.Method,
 				"Status":   c.Writer.Status(),
 			}
