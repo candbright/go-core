@@ -78,6 +78,9 @@ func (value *OsParser) Get() string {
 }
 
 func envParser(valMap map[interface{}]interface{}) Parser {
+	if valMap == nil {
+		return nil
+	}
 	Val1, ok1 := valMap["default"]
 	Val2, ok2 := valMap["env"]
 	if !ok1 || !ok2 {
@@ -87,10 +90,21 @@ func envParser(valMap map[interface{}]interface{}) Parser {
 }
 
 func archParser(valMap map[interface{}]interface{}) Parser {
+	if valMap == nil {
+		return nil
+	}
 	Val1, ok1 := valMap["x86"]
 	Val2, ok2 := valMap["arm"]
 	if !ok1 || !ok2 {
 		return nil
+	}
+	valE1, ok := Val1.(map[interface{}]interface{})
+	if p := envParser(valE1); ok && p != nil {
+		return p
+	}
+	valE2, ok := Val2.(map[interface{}]interface{})
+	if p := envParser(valE2); ok && p != nil {
+		return p
 	}
 	return &BaseParser{&ArchParser{X86: Val1, Arm: Val2}}
 }
@@ -100,6 +114,14 @@ func osParser(valMap map[interface{}]interface{}) Parser {
 	Val2, ok2 := valMap["windows"]
 	if !ok1 || !ok2 {
 		return nil
+	}
+	valE1, ok := Val1.(map[interface{}]interface{})
+	if p := envParser(valE1); ok && p != nil {
+		return p
+	}
+	valE2, ok := Val2.(map[interface{}]interface{})
+	if p := envParser(valE2); ok && p != nil {
+		return p
 	}
 	return &BaseParser{&OsParser{Linux: Val1, Windows: Val2}}
 }

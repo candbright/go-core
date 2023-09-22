@@ -15,7 +15,9 @@ application:
     x86: '/root'
     arm: '/home'
   osdir:
-    linux: '/root'
+    linux:
+      env: ${CORE_OSDIR_LINUX}
+      default: '/root'
     windows: 'D:/home'
 release: true
 db:
