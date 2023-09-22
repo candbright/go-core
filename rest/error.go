@@ -7,7 +7,7 @@ import (
 
 type HttpError struct {
 	Err        error `json:"-"`
-	Code       int64 `json:"code"`
+	Code       int   `json:"code"`
 	HttpStatus int   `json:"-"`
 }
 
@@ -15,11 +15,11 @@ func (e HttpError) Error() string {
 	return fmt.Sprintf("%+v", e)
 }
 
-func NewHttpError(err error, code int64, httpStatus int) HttpError {
+func NewHttpError(err error, code int, httpStatus int) HttpError {
 	return HttpError{err, code, httpStatus}
 }
 
-func CodeError(err error, code int64) HttpError {
+func CodeError(err error, code int) HttpError {
 	return HttpError{err, code, http.StatusInternalServerError}
 }
 

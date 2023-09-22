@@ -15,7 +15,7 @@ type Dog struct {
 func TestGET(t *testing.T) {
 	engine := gin.Default()
 	engine.POST("/test", func(context *gin.Context) {
-		POST[Dog](context, func(receive Dog) (interface{}, error) {
+		GenericReq[Dog](context, func(receive Dog) (interface{}, error) {
 			return receive, nil
 		})
 	})

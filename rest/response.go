@@ -15,13 +15,13 @@ const (
 
 type Result struct {
 	Err        error       `json:"-"`
-	Code       int64       `json:"code"`
+	Code       int         `json:"code"`
 	HttpStatus int         `json:"-"`
 	Data       interface{} `json:"data,omitempty"`
 	Message    string      `json:"message,omitempty"`
 }
 
-func NewResult(code int64, data interface{}, err error, status int) Result {
+func NewResult(code int, data interface{}, err error, status int) Result {
 	return Result{
 		err,
 		code,
@@ -31,7 +31,7 @@ func NewResult(code int64, data interface{}, err error, status int) Result {
 	}
 }
 
-func Ok(c *gin.Context, data interface{}) {
+func Success(c *gin.Context, data interface{}) {
 	if data != nil {
 		Response(c, NewResult(CodeSuccess, data, nil, http.StatusOK))
 	} else {
@@ -39,7 +39,7 @@ func Ok(c *gin.Context, data interface{}) {
 	}
 }
 
-func Error(c *gin.Context, err error) {
+func Failed(c *gin.Context, err error) {
 	if err == nil {
 		Response(c, NewResult(CodeUnknown, nil, nil, http.StatusInternalServerError))
 	} else {

@@ -1,18 +1,15 @@
 package rest
 
 import (
-	"github.com/candbright/go-log/log"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"net/http"
 	"reflect"
 )
 
-var ErrFunc = func(err error) {
-	log.Error(err)
-}
+var ErrFunc func(err error)
 
-func GET(context *gin.Context, handler func() (interface{}, error)) {
+func SimpleReq(context *gin.Context, handler func() (interface{}, error)) {
 	var (
 		err error
 	)
@@ -21,13 +18,13 @@ func GET(context *gin.Context, handler func() (interface{}, error)) {
 		if ErrFunc != nil {
 			ErrFunc(err)
 		}
-		Error(context, err)
+		Failed(context, err)
 		return
 	}
-	Ok(context, res)
+	Success(context, res)
 }
 
-func POST[T any](context *gin.Context, handler func(receive T) (interface{}, error)) {
+func GenericReq[T any](context *gin.Context, handler func(receive T) (interface{}, error)) {
 	var (
 		err error
 	)
@@ -36,7 +33,7 @@ func POST[T any](context *gin.Context, handler func(receive T) (interface{}, err
 		if ErrFunc != nil {
 			ErrFunc(err)
 		}
-		Error(context, NewHttpError(err, CodeBindJsonFailed, http.StatusBadRequest))
+		Failed(context, NewHttpError(err, CodeBindJsonFailed, http.StatusBadRequest))
 		return
 	}
 	if preCheck, ok := reflect.ValueOf(receive).Interface().(Check); ok {
@@ -46,7 +43,7 @@ func POST[T any](context *gin.Context, handler func(receive T) (interface{}, err
 			if ErrFunc != nil {
 				ErrFunc(checkErr)
 			}
-			Error(context, NewHttpError(checkErr, CodePreCheckFailed, http.StatusBadRequest))
+			Failed(context, NewHttpError(checkErr, CodePreCheckFailed, http.StatusBadRequest))
 			return
 		}
 	}
@@ -55,16 +52,8 @@ func POST[T any](context *gin.Context, handler func(receive T) (interface{}, err
 		if ErrFunc != nil {
 			ErrFunc(err)
 		}
-		Error(context, err)
+		Failed(context, err)
 		return
 	}
-	Ok(context, res)
-}
-
-func PUT[T any](context *gin.Context, handler func(receive T) (interface{}, error)) {
-	POST(context, handler)
-}
-
-func DELETE(context *gin.Context, handler func() (interface{}, error)) {
-	GET(context, handler)
+	Success(context, res)
 }
