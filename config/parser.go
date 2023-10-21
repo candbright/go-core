@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 	"strconv"
 	"strings"
@@ -47,8 +48,9 @@ type EnvParser struct {
 }
 
 func (p *EnvParser) Get() string {
-	if p.Env != nil {
-		return fmt.Sprint(p.Env)
+	env := os.ExpandEnv(fmt.Sprint(p.Env))
+	if env != "" {
+		return env
 	}
 	return fmt.Sprint(p.Default)
 }

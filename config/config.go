@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
-	"os"
 	"strings"
 )
 
@@ -17,48 +16,44 @@ const JSON ParseType = "JSON"
 type ParseType string
 
 type Config struct {
-	data map[interface{}]interface{}
+	originData []byte
+	parseType  ParseType
+	data       map[interface{}]interface{}
 }
 
 func Parse(data []byte, parseType ParseType) (*Config, error) {
-	config := &Config{}
-	err := config.parse(string(data), parseType)
+	config := &Config{
+		originData: data,
+		parseType:  parseType,
+	}
+	err := config.parse()
 	if err != nil {
 		return nil, err
 	}
 	return config, nil
 }
 
-func (c *Config) Parse(fileName string, parseType ParseType) error {
-	file, err := os.ReadFile(fileName)
-	if err != nil {
-		return err
-	}
-	err = c.parse(string(file), parseType)
-	if err != nil {
-		return err
-	}
-	return nil
+func (c *Config) Reload() error {
+	return c.parse()
 }
 
-func (c *Config) parse(data string, parseType ParseType) error {
-	expandData := os.ExpandEnv(data)
+func (c *Config) parse() error {
 	var err error
-	switch parseType {
+	switch c.parseType {
 	case YAML:
-		err = yaml.Unmarshal([]byte(expandData), &c.data)
+		err = yaml.Unmarshal(c.originData, &c.data)
 		if err != nil {
 			return err
 		}
 		break
 	case XML:
-		err = xml.Unmarshal([]byte(expandData), &c.data)
+		err = xml.Unmarshal(c.originData, &c.data)
 		if err != nil {
 			return err
 		}
 		break
 	case JSON:
-		err = json.Unmarshal([]byte(expandData), &c.data)
+		err = json.Unmarshal(c.originData, &c.data)
 		if err != nil {
 			return err
 		}
